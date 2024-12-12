@@ -66,6 +66,15 @@
   <middle>
     <section>
       <name>Introduction</name>
+      <t>To help achieve the highest possible MTU end-to-end, this document
+        extends BGP-4 to aid network operators in this effort by signalling
+        the MTU for each route.</t>
+
+      <t>A new BGP capability declaring the link MTU is specified in <xref target="new-cap"/>.</t>
+
+      <t>An optional, non-transitive attribute, called "Path MTU", is specified in <xref target="new-attr"/>.
+        It allows network administrators to use Path MTU in their route selection.
+        The main focus/applicability is the Internet (IPv4 and IPv6 unicast route advertisements).</t>
 
       <section>
         <name>Requirements Language</name>
@@ -75,6 +84,12 @@
           interpreted as described in <xref target="BCP14"/> (<xref target="RFC2119"/>, <xref target="RFC8174"/>) when,
           and only when, they appear in all capitals, as shown here.</t>
       </section>
+    </section>
+    <section anchor="new-cap">
+      <name>New BGP Capabilityg</name>
+    </section>
+    <section anchor="new-attr">
+      <name>New BGP Attribute</name>
     </section>
   </middle>
 

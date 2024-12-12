@@ -5,7 +5,8 @@
 *.txt
 *.upload
 *~
-.idea//lib
+.idea/
+/lib
 .tags
 /*-[0-9][0-9].xml
 /.*.mk
