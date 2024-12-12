@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-model href="rfc7991bis.rnc"?>
 <!DOCTYPE rfc [
-  <!ENTITY nbsp    "&#160;">
-  <!ENTITY zwsp   "&#8203;">
-  <!ENTITY nbhy   "&#8209;">
-  <!ENTITY wj     "&#8288;">
-]>
+    <!ENTITY nbsp    "&#160;">
+    <!ENTITY zwsp   "&#8203;">
+    <!ENTITY nbhy   "&#8209;">
+    <!ENTITY wj     "&#8288;">
+    ]>
 
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
      ipr="trust200902" submissionType="IETF" category="std" version="3" docName="draft-blahaj-idr-bgp-mtu-latest"
@@ -59,7 +59,10 @@
     <note removeInRFC="true">
       <name>Discussion</name>
       <t>Source for this draft and an issue tracker can be found at
-        <eref target="https://github.com/TheEnbyperor/draft-blahaj-idr-bgp-mtu"/>.</t>
+        <eref target="https://github.com/TheEnbyperor/draft-blahaj-idr-bgp-mtu"/>.
+      </t>
+      <t>A ford of BIRD implementing this draft can be found at
+        <eref target="https://github.com/theenbyperor/bird"/>.</t>
     </note>
   </front>
 
@@ -68,28 +71,188 @@
       <name>Introduction</name>
       <t>To help achieve the highest possible MTU end-to-end, this document
         extends BGP-4 to aid network operators in this effort by signalling
-        the MTU for each route.</t>
+        the MTU for each route.
+      </t>
 
-      <t>A new BGP capability declaring the link MTU is specified in <xref target="new-cap"/>.</t>
+      <t>A new BGP capability declaring the link MTU is specified in <xref target="new-cap"/>.
+      </t>
 
       <t>An optional, non-transitive attribute, called "Path MTU", is specified in <xref target="new-attr"/>.
         It allows network administrators to use Path MTU in their route selection.
-        The main focus/applicability is the Internet (IPv4 and IPv6 unicast route advertisements).</t>
+        The main focus/applicability is the Internet (IPv4 and IPv6 unicast route advertisements).
+      </t>
+
+      <t>The BGP attribute defined in this document can be attached to prefixes from
+        Multiprotocol BGP IPv4/IPv6 Labeled Unicast (<xref target="RFC4760"/> <xref target="RFC8277"/>).
+        Usage of this BGP attribute for other Address Family Identifier (AFI) /
+        Subsequent Address Family Identifier (SAFI) combinations is not defined herein but may be
+        specified in future specifications.
+      </t>
 
       <section>
         <name>Requirements Language</name>
         <t>The key words <bcp14>MUST</bcp14>, <bcp14>MUST NOT</bcp14>, <bcp14>REQUIRED</bcp14>, <bcp14>SHALL</bcp14>,
           <bcp14>SHALL NOT</bcp14>, <bcp14>SHOULD</bcp14>, <bcp14>SHOULD NOT</bcp14>, <bcp14>RECOMMENDED</bcp14>,
           <bcp14>NOT RECOMMENDED</bcp14>, <bcp14>MAY</bcp14>, and <bcp14>OPTIONAL</bcp14> in this document are to be
-          interpreted as described in <xref target="BCP14"/> (<xref target="RFC2119"/>, <xref target="RFC8174"/>) when,
-          and only when, they appear in all capitals, as shown here.</t>
+          interpreted as described in
+          <xref target="BCP14"/>
+          (<xref target="RFC2119"/>,<xref target="RFC8174"/>) when,
+          and only when, they appear in all capitals, as shown here.
+        </t>
+      </section>
+
+      <section>
+        <name>Terminology</name>
+        <t>The terms "MTU" in this document signifies the Maximum Transmission Unit for a given BGP address family.</t>
       </section>
     </section>
+    <section>
+      <name>Assumptions</name>
+      <t>All MTU values are measured in bytes at layer 3.</t>
+      <t>Each BGP speaker is configured with the following values:</t>
+      <ul>
+        <li>Link MTU: Maximum packet size the BGP speaker can process through its own ASN</li>
+        <li>Fallback MTU: Maximum packet size if no per-route information is supplied
+          (usually 1500 bytes)
+        </li>
+      </ul>
+      <t>It is also assumed that the FIB used by the BGP speaker supports per-destination MTU
+        values, such as is the case for the Linux kernel.
+      </t>
+    </section>
+    <section>
+      <name>Theory of Operation</name>
+      <t>A BGP speaker advertises the link MTU capability as follows:</t>
+      <ul>
+        <li>The link MTU capability is announced only if a BGP speaker understands the Path
+    MTU route attribute</li>
+        <li>The link MTU capability is set to the configured local Link MTU, as defined above</li>
+      </ul>
+      <t>When establishing a session with a peer, a BGP speaker does the following:</t>
+      <ul>
+        <li>If the peer advertises the link MTU capability, compute the effective link MTU
+          as the minimum of the locally configured link MTU and the link MTU advertised
+          by the peer</li>
+        <li>
+          If the peer link MTU is different from the local link MTU, an implementation
+          <bcp14>SHOULD</bcp14> emit a warning
+        </li>
+      </ul>
+      <t>When announcing a route:</t>
+      <ul>
+        <li>If the session does not have an effective link MTU, then this part is ignored.</li>
+        <li>
+          <t>Otherwise, if the route already has a path MTU attribute</t>
+          <ul>
+            <li>If the effective link MTU is smaller than the value in the attribute,
+              update the path MTU value in the attribute to the value of the effective
+              link MTU</li>
+            <li>Leave the origin ASN in the attribute as-is</li>
+          </ul>
+        </li>
+        <li>
+          <t>If the route does not already have a path MTU attribute,
+            add a new attribute with</t>
+          <ul>
+            <li>The MTU value set to the effective link MTU</li>
+            <li>The ASN set to the local ASN</li>
+          </ul>
+        </li>
+      </ul>
+      <t>When installing a route into the FIB:</t>
+      <ul>
+        <li>If the route has no path MTU attribute, install the route with the fallback MTU.</li>
+        <li>If the ASN appearing in the path MTU attribute is different from the originating ASN from the AS path,
+          ignore the attribute and install the route with the fallback MTU.</li>
+        <li>Otherwise, compute the route MTU as the minimum of the effective link MTU and the value in the path MTU
+          attribute, and install the route with this route MTU.</li>
+      </ul>
+    </section>
     <section anchor="new-cap">
-      <name>New BGP Capabilityg</name>
+      <name>Link MTU Capability</name>
+      <t>A new BGP capability with ID XXX is defined with the following contents:</t>
+      <artwork align="left">
+0                   1
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|fl.|          Link MTU         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      </artwork>
+      <dl>
+        <dt>Flags</dt>
+        <dd>2 bits; flags are reserved for future use and <bcp14>MUST</bcp14> be 0.</dd>
+        <dt>Link MTU</dt>
+        <dd>14 bits; The BGP speakers MTU for the link a BGP session is being negotiated over.</dd>
+      </dl>
     </section>
     <section anchor="new-attr">
-      <name>New BGP Attribute</name>
+      <name>Path MTU Attribute</name>
+      <t>A new optional, non-transitive BGP attribute with ID XXX is defined with the following contents:</t>
+      <artwork align="left">
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Origin ASN                            |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|fl.|          Path MTU         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      </artwork>
+      <dl>
+        <dt>Origin ASN</dt>
+        <dd>32 bits; the first ASN along the path to support this attribute.</dd>
+        <dt>Flags</dt>
+        <dd>2 bits; flags are reserved for future use and <bcp14>MUST</bcp14> be 0.</dd>
+        <dt>Link MTU</dt>
+        <dd>14 bits; The MTU for a route.</dd>
+      </dl>
+    </section>
+
+    <section anchor="IANA">
+      <name>IANA Considerations</name>
+      <section>
+        <name>Capability</name>
+        <t>Per this document, IANA is requested to add one new entry to the "Capability Codes" registry defined in
+          <xref target="RFC5492"/>. This entry is defined below:</t>
+        <table>
+          <name>New entries</name>
+          <thead>
+            <tr>
+              <th>Value</th>
+              <th>Description</th>
+              <th>Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TBD</td>
+              <td>Link MTU</td>
+              <td>This document</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section>
+        <name>Path Attribute</name>
+        <t>Per this document, IANA is requested to add one new entry to the "BGP Path Attributes" registry defined in
+          <xref target="RFC4271"/>. This entry is defined below:</t>
+        <table>
+          <name>New entries</name>
+          <thead>
+            <tr>
+              <th>Value</th>
+              <th>Code</th>
+              <th>Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TBD</td>
+              <td>Path MTU</td>
+              <td>This document</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </section>
   </middle>
 
@@ -103,6 +266,11 @@
           <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml"/>
           <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
         </referencegroup>
+
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4271.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4760.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.5492.xml"/>
+        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8277.xml"/>
       </references>
       <references>
         <name>Informative References</name>
@@ -113,7 +281,8 @@
     <section anchor="Acknowledgements" numbered="false">
       <name>Acknowledgements</name>
       <t>With thanks to the RIPE NCC for hosting their Green Tech Hackathon 2024
-        that prompted this document.</t>
+        that prompted this document.
+      </t>
     </section>
   </back>
 </rfc>
