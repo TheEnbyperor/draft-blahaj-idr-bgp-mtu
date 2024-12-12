@@ -6,7 +6,6 @@
 *.upload
 *~
 .idea/
-/lib
 .tags
 /*-[0-9][0-9].xml
 /.*.mk
@@ -14,6 +13,7 @@
 /.refcache
 /.venv/
 /.vscode/
+/lib
 /node_modules/
 /versioned/
 Gemfile.lock
