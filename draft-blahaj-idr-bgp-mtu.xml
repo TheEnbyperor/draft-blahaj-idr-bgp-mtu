@@ -83,7 +83,7 @@
       </t>
 
       <t>The BGP attribute defined in this document can be attached to prefixes from
-        Multiprotocol BGP IPv4/IPv6 Labeled Unicast (<xref target="RFC4760"/> <xref target="RFC8277"/>).
+        Multiprotocol BGP IPv4/IPv6 Labeled Unicast (<xref target="RFC4760"/>).
         Usage of this BGP attribute for other Address Family Identifier (AFI) /
         Subsequent Address Family Identifier (SAFI) combinations is not defined herein but may be
         specified in future specifications.
@@ -270,7 +270,6 @@
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4271.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.4760.xml"/>
         <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.5492.xml"/>
-        <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8277.xml"/>
       </references>
       <references>
         <name>Informative References</name>
