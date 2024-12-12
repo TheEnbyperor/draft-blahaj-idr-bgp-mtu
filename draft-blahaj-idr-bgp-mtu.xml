@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="rfc7991bis.rnc"?>
+<!DOCTYPE rfc [
+  <!ENTITY nbsp    "&#160;">
+  <!ENTITY zwsp   "&#8203;">
+  <!ENTITY nbhy   "&#8209;">
+  <!ENTITY wj     "&#8288;">
+]>
+
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude"
+     ipr="trust200902" submissionType="IETF" category="std" version="3" docName="draft-blahaj-idr-bgp-mtu-latest"
+     consensus="true">
+  <front>
+    <title abbrev="BGP MTU Attribute">Signalling Path MTU via BGP Attributes</title>
+    <seriesInfo name="Internet-Draft" status="standard" value="draft-blahaj-idr-bgp-mtu-latest"/>
+    <author fullname="Q Misell" initials="Q" surname="Misell" role="editor">
+      <organization abbrev="AS207960">AS207960 Cyfyngedig</organization>
+      <address>
+        <postal>
+          <street>13 Pen-y-lan Terrace</street>
+          <city>Caerdydd</city>
+          <code>CF23 9EU</code>
+          <country>United Kingdom</country>
+        </postal>
+        <email>q@as207960.net</email>
+        <email>q@magicalcodewit.ch</email>
+        <uri>https://magicalcodewit.ch</uri>
+      </address>
+    </author>
+    <author fullname="Asbjørn Sloth Tonnesen" initials="A" surname="Tonnesen">
+      <address>
+        <postal>
+          <street>Alliancevej 17, 2. th.</street>
+          <city>København</city>
+          <code>2450</code>
+          <country>Denmark</country>
+        </postal>
+        <email>ietf@a5n.dk</email>
+      </address>
+    </author>
+    <author fullname="Toke Hoiland-Jorgensen" initials="T" surname="Hoiland-Jorgensen">
+      <address>
+        <postal>
+          <street>Borgediget 5</street>
+          <city>Roskilde</city>
+          <code>4000</code>
+          <country>Denmark</country>
+        </postal>
+        <email>toke@toke.dk</email>
+      </address>
+    </author>
+    <area>rtg</area>
+    <workgroup>Inter-Domain Routing</workgroup>
+
+    <abstract>
+      <t></t>
+    </abstract>
+
+    <note removeInRFC="true">
+      <name>Discussion</name>
+      <t>Source for this draft and an issue tracker can be found at
+        <eref target="https://github.com/TheEnbyperor/draft-blahaj-idr-bgp-mtu"/>.</t>
+    </note>
+  </front>
+
+  <middle>
+    <section>
+      <name>Introduction</name>
+
+      <section>
+        <name>Requirements Language</name>
+        <t>The key words <bcp14>MUST</bcp14>, <bcp14>MUST NOT</bcp14>, <bcp14>REQUIRED</bcp14>, <bcp14>SHALL</bcp14>,
+          <bcp14>SHALL NOT</bcp14>, <bcp14>SHOULD</bcp14>, <bcp14>SHOULD NOT</bcp14>, <bcp14>RECOMMENDED</bcp14>,
+          <bcp14>NOT RECOMMENDED</bcp14>, <bcp14>MAY</bcp14>, and <bcp14>OPTIONAL</bcp14> in this document are to be
+          interpreted as described in <xref target="BCP14"/> (<xref target="RFC2119"/>, <xref target="RFC8174"/>) when,
+          and only when, they appear in all capitals, as shown here.</t>
+      </section>
+    </section>
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+
+        <referencegroup anchor="BCP14" target="https://www.rfc-editor.org/info/bcp14">
+          <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.2119.xml"/>
+          <xi:include href="https://www.rfc-editor.org/refs/bibxml/reference.RFC.8174.xml"/>
+        </referencegroup>
+      </references>
+      <references>
+        <name>Informative References</name>
+
+      </references>
+    </references>
+
+    <section anchor="Acknowledgements" numbered="false">
+      <name>Acknowledgements</name>
+      <t>With thanks to the RIPE NCC for hosting their Green Tech Hackathon 2024
+        that prompted this document.</t>
+    </section>
+  </back>
+</rfc>
